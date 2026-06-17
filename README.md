@@ -1,5 +1,5 @@
 # 🧠 Features del MLP vs Heurística — Proyecto Scheduling con IA
-Arquitectura Neuronal Predictiva para Optimización de Scheduling Operativo (ABAJO)
+#  🧠 Arquitectura Neuronal Predictiva para Optimización de Scheduling Operativo (ABAJO)
 
 ## 📌 Resumen
 
