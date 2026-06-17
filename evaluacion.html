@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Matemático MLP</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css');
+
+        :root {
+            --bg-body: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            
+            --accent-1: #3b82f6; /* Blue for Data */
+            --accent-2: #8b5cf6; /* Purple for Network */
+            --accent-3: #ef4444; /* Red for Loss */
+            --accent-4: #10b981; /* Green for Eval */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+        
+        header { text-align: center; margin-bottom: 4rem; }
+        h1 { font-size: 2.8rem; font-weight: 800; color: var(--text-main); }
+
+        /* Timeline / Pipeline Layout */
+        .pipeline-node {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .pipeline-node::before {
+            content: '';
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            width: 2px;
+            height: 2rem;
+            background: var(--border-color);
+        }
+        .pipeline-node:first-child::before { display: none; }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .node-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .n1 { background: var(--accent-1); }
+        .n2 { background: var(--accent-2); }
+        .n3 { background: var(--accent-3); }
+        .n4 { background: var(--accent-4); }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; gap: 2rem; } }
+
+        .math-box {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            border-left: 4px solid var(--text-muted);
+        }
+
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .kpi-card {
+            background: #0f172a;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .kpi-value { font-size: 2rem; font-weight: 800; font-family: 'Outfit', sans-serif; }
+        .kpi-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Chart mockups */
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            position: relative;
+            margin-top: 1rem;
+            overflow: hidden;
+            background-image: linear-gradient(#f8fafc 1px, transparent 1px), linear-gradient(90deg, #f8fafc 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .line { position: absolute; height: 3px; transform-origin: left center; }
+        .line-train { background: var(--accent-1); }
+        .line-val { background: var(--accent-3); }
+    </style>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Flujo Matemático y Entrenamiento</h1>
+            <p style="color: var(--text-muted); font-size: 1.2rem;">Desde los datos crudos hasta el Descenso del Gradiente</p>
+        </header>
+
+        <div class="pipeline-node">
+            <div class="node-header">
+                <div class="node-number n1">1</div>
+                <h2>Simulación Monte Carlo y Vectorización</h2>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <p>Los datos crudos de este problema consisten en 5 empleados y 8 turnos. Esto produce apenas 40 pares posibles. Una red neuronal no puede converger con un volumen tan bajo de muestras si se busca viabilidad en un entorno de producción.</p>
+                    <p>Para solucionar esta limitación técnica y escalar el modelo, el método <code>generar_dataset(500)</code> inyecta ruido aleatorio en la heurística base para simular 500 escenarios alternativos de la asignación semanal. Esto escala el conjunto de datos a <strong>20,000 muestras</strong> (500 soluciones × 40 pares).</p>
+                    <p>Cada par empleado-turno se vectoriza desde texto plano a un <strong>Tensor</strong> unidimensional de 10 características continuas $\in [0, 1]$. La etiqueta real (Ground Truth) se establece como $y = 1$ si en esa simulación específica el empleado fue asignado, y $y = 0$ en caso contrario.</p>
+                </div>
+                <div>
+                    <div class="math-box">
+                        <strong>Input Vector (X):</strong><br>
+                        $X_i = [1.0, 0.37, 0.62, 1.0, 0.0, 0.5, 0.66, 0.0, 0.37, 0.71]$<br><br>
+                        <strong>Label (y):</strong><br>
+                        $y_i = 1.0$<br><br>
+                        <strong>Matriz Final (X_train):</strong><br>
+                        $16,000 \times 10$ (Filas x Features)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pipeline-node">
+            <div class="node-header">
+                <div class="node-number n2">2</div>
+                <h2>Partición 80/20 y Arquitectura de Capas</h2>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <h3>Partición Estática</h3>
+                    <p>El algoritmo ejecuta una partición estricta de las 20,000 muestras: <strong>80% (16,000)</strong> se destinan a la optimización de pesos (Entrenamiento) y el <strong>20% (4,000)</strong> restante se mantiene oculto para validar la capacidad de generalización del modelo (Validación).</p>
+                    
+                    <h3 style="margin-top: 1.5rem;">Funciones de Activación</h3>
+                    <p><strong>Capas Ocultas (ReLU):</strong> Las capas densas de 64, 32 y 16 neuronas implementan la función de activación Rectified Linear Unit. Matemáticamente definida como $f(x) = \max(0, x)$. Esta función trunca los valores negativos a cero, introduciendo no-linealidad estricta en el sistema y previniendo el problema del desvanecimiento del gradiente inherente a redes profundas.</p>
+                    <p><strong>Capa de Salida (Sigmoide):</strong> Proyecta la combinación lineal final hacia un rango continuo entre 0 y 1. Definida como $S(x) = \frac{1}{1 + e^{-x}}$. De este modo, la salida de la red es directamente interpretable como la <strong>probabilidad</strong> matemática de asignación del empleado.</p>
+                </div>
+                <div>
+                    <div class="math-box" style="border-left-color: var(--accent-2);">
+                        <strong>Arquitectura Keras:</strong><br>
+                        $L_1: 10 \times 64$ pesos + 64 sesgos<br>
+                        $L_2: 64 \times 32$ pesos + 32 sesgos<br>
+                        $L_3: 32 \times 16$ pesos + 16 sesgos<br>
+                        $L_{out}: 16 \times 1$ pesos + 1 sesgo<br><br>
+                        <strong>Parámetros Entrenables Totales:</strong> 3,329
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pipeline-node">
+            <div class="node-header">
+                <div class="node-number n3">3</div>
+                <h2>El Motor: Loss, Gradiente y Optimización</h2>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <h3>Cálculo de la Función de Costo (Loss)</h3>
+                    <p>Dado que es un problema de clasificación binaria, se implementa la función de costo <code>binary_crossentropy</code> (Entropía Cruzada Binaria). Esta métrica cuantifica la divergencia estadística entre la distribución de probabilidad inferida por el modelo y las etiquetas reales. Castiga exponencialmente las predicciones con alta confianza que resultan incorrectas.</p>
+                    <p>$$Loss = - \frac{1}{N} \sum_{i=1}^N [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]$$</p>
+
+                    <h3 style="margin-top: 1.5rem;">Descenso del Gradiente y Optimizador Adam</h3>
+                    <p>El algoritmo calcula los gradientes mediante derivadas parciales de la función de pérdida respecto a cada uno de los 3,329 pesos de la arquitectura (Backpropagation). Este vector gradiente establece la dirección matemática exacta para minimizar el error topológico. Se utiliza el optimizador Adam (Adaptive Moment Estimation), el cual calcula tasas de aprendizaje adaptativas para cada parámetro de forma independiente, garantizando una convergencia rápida hacia el objetivo y evitando el estancamiento en mínimos locales.</p>
+                </div>
+                <div>
+                    <div class="kpi-board">
+                        <div class="kpi-card" style="background: #7f1d1d;">
+                            <div class="kpi-label">Loss Final (Train)</div>
+                            <div class="kpi-value">0.0959</div>
+                        </div>
+                        <div class="kpi-card" style="background: #991b1b;">
+                            <div class="kpi-label">Val Loss (Examen)</div>
+                            <div class="kpi-value">0.0971</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                        * Los registros reales del modelo evidencian una convergencia matemática sólida. La métrica de error disminuyó de 0.22 a 0.09 a lo largo de 50 épocas de entrenamiento.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pipeline-node">
+            <div class="node-header">
+                <div class="node-number n4">4</div>
+                <h2>Métricas y Detección de Overfitting</h2>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <h3>Cálculo de Exactitud (Accuracy)</h3>
+                    <p>La exactitud (Accuracy) es una métrica de interpretación humana, no el objetivo directo de la optimización matemática. Una vez que la capa de salida sigmoide genera un valor continuo (ej. $\hat{y} = 0.82$), se aplica un umbral de decisión rígido, estandarizado en $0.5$.</p>
+                    <p>Para toda predicción donde $\hat{y} \ge 0.5$, la salida de red se clasifica binariamente como $1$. Si la etiqueta real de dicha muestra (Ground Truth) era efectivamente $1$, se contabiliza como un Verdadero Positivo. La métrica final representa estrictamente la proporción de clasificaciones correctas sobre la cardinalidad total del lote analizado.</p>
+                    
+                    <h3 style="margin-top: 1.5rem;">Detección de Sobreajuste (Overfitting)</h3>
+                    <p>El fenómeno de sobreajuste se presenta cuando la red neuronal pierde su capacidad de generalización y comienza a memorizar el ruido específico del conjunto de entrenamiento. La detección de esta anomalía técnica se realiza analizando la divergencia en la gráfica cartesiana entre la pérdida de entrenamiento (<code>Loss</code>) y la pérdida de validación (<code>Val_Loss</code>).</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-muted);">
+                        <li>Si ambas funciones descienden simétricamente, el modelo <strong>aprende patrones subyacentes</strong>.</li>
+                        <li>Si <code>Loss</code> desciende pero <code>Val_Loss</code> presenta tendencia al alza o rebote, el sistema <strong>está sobreajustando</strong>.</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="kpi-board" style="margin-top: 0;">
+                        <div class="kpi-card" style="background: #064e3b;">
+                            <div class="kpi-label">Accuracy (Train)</div>
+                            <div class="kpi-value">94.21%</div>
+                        </div>
+                        <div class="kpi-card" style="background: #065f46;">
+                            <div class="kpi-label">Val Accuracy</div>
+                            <div class="kpi-value">93.90%</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                        * El análisis de los archivos generados indica que la métrica Val Loss desciende de forma estable hasta la época ~22, para posteriormente oscilar en el rango de 0.095 a 0.098. Esto determina empíricamente que 50 épocas representan el límite de capacidad de esta iteración; continuar el entrenamiento resultaría en sobreajuste directo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pipeline-node" style="background: #f8fafc;">
+            <div class="node-header" style="border-bottom-color: #cbd5e1;">
+                <div class="node-number" style="background: #475569;">5</div>
+                <h2>Evaluación Estricta de Negocio en Producción</h2>
+            </div>
+            <p>Tras la inferencia probabilística del modelo, el módulo predictivo ejecuta la discretización final imponiendo el cumplimiento estricto de las reglas operativas y restricciones duras de negocio requeridas. Inmediatamente después, interviene el proceso de evaluación de viabilidad. Esta fase descarta deliberadamente el rendimiento estadístico interno de la red neuronal (Accuracy/Loss) para cuantificar de forma rigurosa exclusivamente los <strong>KPIs Operativos de Negocio</strong> que determinan la utilidad real del producto final:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 1rem; columns: 2;">
+                <li>Cobertura Total (Aseguramiento de los 8 turnos requeridos).</li>
+                <li>Utilización de Horas (Impacto directo en el costo financiero).</li>
+                <li>Desviación Estándar de Horas (Distribución equitativa y riesgo de fatiga de la plantilla).</li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

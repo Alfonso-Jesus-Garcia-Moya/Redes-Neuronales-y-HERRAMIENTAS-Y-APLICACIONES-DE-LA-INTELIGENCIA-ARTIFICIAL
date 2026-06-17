@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explicación Lógica: modelo_mlp.py</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-body: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --card-bg: #ffffff;
+            
+            /* Paleta Tecnológica MLP */
+            --accent-main: #6366f1; /* Indigo */
+            --accent-hover: #4f46e5;
+            --accent-light: #e0e7ff;
+            --accent-gradient: linear-gradient(135deg, #8b5cf6, #6366f1);
+            
+            --border-color: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.02) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, hsla(225,39%,30%,0.02) 0, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Tarjetas de Funciones */
+        .function-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .function-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08);
+        }
+
+        .func-header {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .func-name {
+            font-size: 1.8rem;
+            color: var(--accent-main);
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+        }
+
+        .func-purpose {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .logic-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .logic-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Listas de pasos lógicos */
+        .step-list {
+            list-style: none;
+            counter-reset: logic-counter;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-bottom: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .step-list li::before {
+            counter-increment: logic-counter;
+            content: counter(logic-counter);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-light);
+            color: var(--accent-main);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Bloques de Código */
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            line-height: 1.5;
+        }
+
+        .keyword { color: #c678dd; } /* Morado */
+        .function { color: #61afef; } /* Azul */
+        .string { color: #98c379; } /* Verde */
+        .comment { color: #5c6370; font-style: italic; }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent-main);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Análisis Lógico: modelo_mlp.py</h1>
+            <p class="subtitle">Desglose arquitectónico y funcional de la Red Neuronal para Scheduling</p>
+        </header>
+
+        <div class="function-card">
+            <div class="func-header">
+                <h2 class="func-name">entrenar_mlp()</h2>
+                <span class="func-purpose">Construcción y optimización del modelo</span>
+            </div>
+            
+            <p>Esta función es el núcleo de aprendizaje. Su objetivo es tomar un conjunto de datos (features y labels) y ajustar los pesos de la red neuronal para que aprenda a relacionar el perfil de un empleado con la idoneidad para un turno.</p>
+
+            <div class="logic-grid">
+                <div>
+                    <h3>Lógica de Ejecución</h3>
+                    <ul class="step-list">
+                        <li><strong>Definición Arquitectónica:</strong> Instancia un modelo `Sequential` de Keras. Crea una estructura de embudo (64 → 32 → 16 neuronas) con activación `ReLU` para capturar relaciones no lineales complejas entre las características del turno y el empleado.</li>
+                        <li><strong>Capa de Salida:</strong> Utiliza una única neurona con activación `Sigmoid` para garantizar que la salida sea estrictamente una probabilidad (valor entre 0.0 y 1.0).</li>
+                        <li><strong>Compilación:</strong> Asigna `adam` como optimizador (eficiente para ajuste de pesos) y `binary_crossentropy` como función de pérdida, la cual es estándar para clasificación binaria (asignar o no asignar).</li>
+                        <li><strong>Validación Cruzada Simple:</strong> Divide el dataset estáticamente en 80% entrenamiento y 20% validación para monitorear el sobreajuste (overfitting).</li>
+                        <li><strong>Entrenamiento:</strong> Ejecuta el método `.fit()`, iterando `epochs` veces sobre los datos en lotes (`batch_size`), y evalúa métricas finales.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Código Core</h3>
+<pre><code><span class="keyword">def</span> <span class="function">entrenar_mlp</span>(X, y, epochs=50, batch_size=32):
+    modelo = keras.Sequential([
+        layers.Input(shape=(X.shape[1],)),
+        layers.Dense(<span class="keyword">64</span>, activation=<span class="string">'relu'</span>),
+        layers.Dense(<span class="keyword">32</span>, activation=<span class="string">'relu'</span>),
+        layers.Dense(<span class="keyword">16</span>, activation=<span class="string">'relu'</span>),
+        layers.Dense(<span class="keyword">1</span>, activation=<span class="string">'sigmoid'</span>)
+    ])
+    modelo.compile(
+        optimizer=<span class="string">'adam'</span>,
+        loss=<span class="string">'binary_crossentropy'</span>,
+        metrics=[<span class="string">'accuracy'</span>]
+    )
+    <span class="comment"># ... división y .fit()</span>
+    <span class="keyword">return</span> modelo, historial</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="function-card">
+            <div class="func-header">
+                <h2 class="func-name">predecir_asignacion()</h2>
+                <span class="func-purpose">Inferencia y aplicación de reglas de negocio operativas</span>
+            </div>
+            
+            <p>El modelo matemático por sí solo no garantiza una asignación legal (puede predecir que alguien trabaje 100 horas si las features son engañosas). Esta función actúa como el puente entre la IA probabilística y la realidad operativa mediante una estrategia *Greedy* post-predicción.</p>
+
+            <div class="logic-grid">
+                <div>
+                    <h3>Lógica de Ejecución</h3>
+                    <ul class="step-list">
+                        <li><strong>Generación de Matriz de Posibilidades:</strong> Crea el producto cartesiano de todos los empleados y todos los turnos. Extrae el vector de features para cada par exacto.</li>
+                        <li><strong>Inferencia Batch:</strong> Pasa toda la matriz (`X_pred`) por el MLP entrenado en un solo lote para obtener las probabilidades de éxito de cada par.</li>
+                        <li><strong>Ordenamiento de Prioridad:</strong> Ordena la lista completa de pares de mayor a menor probabilidad. Esto asegura que el algoritmo priorice las combinaciones que la IA considera más "ideales".</li>
+                        <li><strong>Filtro Hard-Constraints:</strong> Itera sobre la lista ordenada. Antes de asignar, pasa por validadores estrictos: ¿El turno está lleno? ¿El empleado está disponible? ¿Supera sus horas máximas? ¿Ya trabaja ese día? Si falla alguna, se descarta la asignación sin importar qué tan alta fuera la probabilidad de la red neuronal.</li>
+                        <li><strong>Registro y Exportación:</strong> Construye el estado final de las asignaciones, calcula las horas consumidas y exporta la estructura a `asignacion_mlp.json`.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Código Core</h3>
+<pre><code><span class="comment"># 1. Obtener probabilidades</span>
+probabilidades = modelo.predict(X_pred).flatten()
+
+<span class="comment"># 2. Asignar probabilidad a cada par y ordenar</span>
+<span class="keyword">for</span> i, p <span class="keyword">in</span> enumerate(pares):
+    p[<span class="string">"probabilidad"</span>] = float(probabilidades[i])
+pares.sort(key=<span class="keyword">lambda</span> p: p[<span class="string">"probabilidad"</span>], reverse=<span class="keyword">True</span>)
+
+<span class="comment"># 3. Asignación Greedy con restricciones</span>
+<span class="keyword">for</span> p <span class="keyword">in</span> pares:
+    <span class="keyword">if</span> len(asignados) >= requeridos: <span class="keyword">continue</span>
+    <span class="keyword">if not</span> esta_disponible(emp, turno): <span class="keyword">continue</span>
+    <span class="keyword">if not</span> puede_trabajar_mas(...): <span class="keyword">continue</span>
+    <span class="keyword">if</span> ya_trabaja_ese_dia(...): <span class="keyword">continue</span>
+    
+    <span class="comment"># Si pasa todo, se asigna</span>
+    asignaciones[turno_id].append(emp_id)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="function-card">
+            <div class="func-header">
+                <h2 class="func-name">guardar_historial()</h2>
+                <span class="func-purpose">Persistencia de métricas de telemetría</span>
+            </div>
+            
+            <p>Extrae las métricas del objeto `History` devuelto por Keras (loss, accuracy, val_loss, val_accuracy) al final del entrenamiento y las serializa en un formato estándar JSON. Su utilidad radica en permitir la posterior graficación de las curvas de aprendizaje sin necesidad de retener el modelo en memoria RAM.</p>
+        </div>
+
+        <div class="function-card">
+            <div class="func-header">
+                <h2 class="func-name">if __name__ == "__main__":</h2>
+                <span class="func-purpose">Orquestador de ejecución (Pipeline de datos)</span>
+            </div>
+            
+            <p>Es el punto de entrada que ejecuta el pipeline secuencial y dependiente requerido para que el entorno funcione. </p>
+            <div style="margin-top: 15px;">
+                <span class="badge">1. generar_dataset()</span> → 
+                <span class="badge">2. entrenar_mlp()</span> → 
+                <span class="badge">3. guardar_historial()</span> → 
+                <span class="badge">4. predecir_asignacion()</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

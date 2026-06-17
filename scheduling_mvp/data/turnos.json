@@ -1,0 +1,10 @@
+[
+  {"id": "T1", "dia": "Lunes",     "horario": "Mañana",   "empleados_requeridos": 2, "horas": 5},
+  {"id": "T2", "dia": "Lunes",     "horario": "Tarde",    "empleados_requeridos": 2, "horas": 5},
+  {"id": "T3", "dia": "Martes",    "horario": "Mañana",   "empleados_requeridos": 2, "horas": 5},
+  {"id": "T4", "dia": "Martes",    "horario": "Tarde",    "empleados_requeridos": 2, "horas": 5},
+  {"id": "T5", "dia": "Miércoles", "horario": "Mañana",   "empleados_requeridos": 2, "horas": 5},
+  {"id": "T6", "dia": "Miércoles", "horario": "Tarde",    "empleados_requeridos": 2, "horas": 5},
+  {"id": "T7", "dia": "Sábado",    "horario": "Completo", "empleados_requeridos": 2, "horas": 5},
+  {"id": "T8", "dia": "Domingo",   "horario": "Completo", "empleados_requeridos": 2, "horas": 5}
+]

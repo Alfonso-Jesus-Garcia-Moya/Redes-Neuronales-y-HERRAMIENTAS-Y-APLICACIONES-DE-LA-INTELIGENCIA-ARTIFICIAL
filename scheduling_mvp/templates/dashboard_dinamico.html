@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Dinámico — Scheduling IA</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0a1628,#1a2744 30%,#0d1f3c 60%,#162950);background-attachment:fixed;color:#e2e8f0}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.08),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.06),transparent 50%);pointer-events:none;z-index:0}
+.glass{background:rgba(15,23,42,.55);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(148,163,184,.15);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05)}
+.header{background:rgba(15,23,42,.65);backdrop-filter:blur(30px);padding:16px 30px;border-bottom:1px solid rgba(96,165,250,.3);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:1.2rem;color:#93c5fd;font-weight:600}
+.header p{color:#64748b;font-size:.8rem}
+.header .links a{color:#94a3b8;font-size:.78rem;margin-left:14px;text-decoration:none;border-bottom:1px dotted rgba(148,163,184,.3)}
+.header .links a:hover{color:#93c5fd}
+.container{max-width:1500px;margin:0 auto;padding:20px;position:relative;z-index:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.card{padding:20px}
+.card h2{font-size:1rem;color:#93c5fd;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,.12);display:flex;align-items:center;gap:8px}
+.card-desc{font-size:.78rem;color:#64748b;margin-bottom:12px;padding:8px 12px;border-radius:8px;background:rgba(59,130,246,.06);border-left:3px solid rgba(59,130,246,.3);line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{background:rgba(51,65,85,.5);color:#93c5fd;padding:8px 10px;text-align:left;font-weight:600;font-size:.75rem;text-transform:uppercase}
+td{padding:7px 10px;border-bottom:1px solid rgba(51,65,85,.3)}
+tr:hover td{background:rgba(51,65,85,.3)}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:600}
+.badge-ok{background:rgba(22,101,52,.5);color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+.badge-warn{background:rgba(113,63,18,.5);color:#fbbf24;border:1px solid rgba(251,191,36,.2)}
+.emp-tag{display:inline-block;padding:2px 8px;margin:1px;border-radius:8px;font-size:.72rem;background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.2)}
+.metric-box{text-align:center;padding:16px;border-radius:14px;background:rgba(15,23,42,.5);border:1px solid rgba(148,163,184,.1)}
+.metric-value{font-size:1.6rem;font-weight:700;color:#60a5fa}
+.metric-label{font-size:.72rem;color:#64748b;margin-top:4px}
+.section-title{font-size:1.15rem;color:#e2e8f0;margin:28px 0 14px;padding-left:12px;border-left:4px solid rgba(59,130,246,.6);font-weight:600}
+.tip{position:relative;cursor:help;border-bottom:1px dotted rgba(148,163,184,.4)}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(15,23,42,.95);backdrop-filter:blur(12px);color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:.72rem;width:max-content;max-width:300px;white-space:normal;line-height:1.4;border:1px solid rgba(148,163,184,.2);box-shadow:0 8px 25px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.25s;z-index:100;pointer-events:none}
+.tip:hover::after{opacity:1;visibility:visible}
+.chart-container{position:relative;height:260px}
+.form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.form-group{display:flex;flex-direction:column;gap:3px;flex:1;min-width:110px}
+.form-group label{font-size:.72rem;color:#94a3b8;font-weight:600}
+.form-group input,.form-group select{background:rgba(30,41,59,.6);border:1px solid rgba(148,163,184,.2);color:#e2e8f0;padding:7px 10px;border-radius:8px;font-size:.8rem}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.checkbox-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.checkbox-group label{font-size:.72rem;color:#94a3b8;display:flex;align-items:center;gap:3px;cursor:pointer}
+.checkbox-group input[type="checkbox"]{accent-color:#3b82f6}
+.btn{border:none;padding:10px 22px;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.3s}
+.btn:hover{transform:translateY(-1px)}
+.btn-add{background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.3)}
+.btn-recalc{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;box-shadow:0 4px 15px rgba(59,130,246,.4)}
+.btn-recalc:disabled{opacity:.5;cursor:wait}
+.winner{color:#4ade80;font-weight:700}
+/* OVERLAY */
+#overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:999;justify-content:center;align-items:center}
+#overlay.show{display:flex}
+#overlay .spinner{text-align:center;color:#93c5fd}
+#overlay .spinner h3{margin-bottom:10px;font-size:1.1rem}
+#overlay .spinner p{color:#64748b;font-size:.85rem}
+.spinner-ring{width:50px;height:50px;border:4px solid rgba(96,165,250,.2);border-top:4px solid #3b82f6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* STATUS */
+#status{display:none;padding:10px 16px;border-radius:10px;margin-bottom:14px;font-size:.82rem;font-weight:500}
+#status.ok{display:block;background:rgba(22,101,52,.3);color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+#status.err{display:block;background:rgba(127,29,29,.3);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.footer{text-align:center;padding:24px;color:#475569;font-size:.72rem;border-top:1px solid rgba(148,163,184,.08);margin-top:24px}
+@media(max-width:900px){.grid,.grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY CARGANDO -->
+<div id="overlay"><div class="spinner"><div class="spinner-ring"></div><h3>⚡ Recalculando...</h3><p>Ejecutando Heurística + MLP (30 épocas) + Comparación</p><p style="margin-top:6px;font-size:.75rem">Esto puede tomar ~30 segundos</p></div></div>
+
+<!-- HEADER -->
+<div class="header">
+<div>
+<h1>🧠 Dashboard Dinámico — Scheduling con IA</h1>
+<p>Agrega empleados y recalcula en tiempo real</p>
+</div>
+<div style="display:flex;align-items:center;gap:14px">
+<div class="links"><a href="/estatico">Ver Dashboard Estático →</a></div>
+<button class="btn btn-recalc" id="btnRecalc" onclick="recalcular()">⚡ Recalcular Todo</button>
+</div>
+</div>
+
+<div class="container">
+
+<div id="status"></div>
+
+<!-- RESUMEN -->
+<h3 class="section-title">📊 Resumen</h3>
+<div class="grid-3" id="resumenBox">
+<div class="metric-box glass"><div class="metric-value" id="mEmps">{{ empleados|length }}</div><div class="metric-label">Empleados</div></div>
+<div class="metric-box glass"><div class="metric-value" id="mTurnos">{{ turnos|length }}</div><div class="metric-label">Turnos</div></div>
+<div class="metric-box glass"><div class="metric-value" id="mCob" style="color:#4ade80">{% if comparacion %}{{ comparacion.metricas.heuristica.cobertura_pct }}% / {{ comparacion.metricas.mlp.cobertura_pct }}%{% else %}—{% endif %}</div><div class="metric-label">Cobertura H / MLP</div></div>
+</div>
+
+<!-- DATOS -->
+<h3 class="section-title">📋 Datos del Problema</h3>
+<div class="grid">
+<!-- EMPLEADOS + FORM -->
+<div class="card glass">
+<h2>👥 Empleados</h2>
+<div class="card-desc">Lista de empleados. Agrega nuevos abajo y presiona <strong>"Recalcular"</strong> para ver cómo cambian los resultados.</div>
+<div id="tablaEmpleados">
+<table><thead><tr><th>ID</th><th>Nombre</th><th>Hrs Máx</th><th>Días</th></tr></thead><tbody>
+{% for emp in empleados %}
+<tr><td><span class="emp-tag">{{ emp.id }}</span></td><td>{{ emp.nombre }}</td><td>{{ emp.horas_max_semana }}h</td><td style="font-size:.72rem">{{ emp.disponibilidad.keys()|list|join(', ') }}</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.1)">
+<h4 style="font-size:.82rem;color:#94a3b8;margin-bottom:8px">➕ Agregar Empleado</h4>
+<div class="form-row">
+<div class="form-group"><label>Nombre</label><input type="text" id="fNombre" placeholder="Ej: Pedro"></div>
+<div class="form-group"><label>Hrs Máx/Semana</label><input type="number" id="fHoras" value="20" min="5" max="48"></div>
+<div class="form-group"><label>Horario</label><select id="fHorario"><option>Mañana</option><option>Tarde</option><option>Completo</option></select></div>
+</div>
+<div class="form-group" style="margin-bottom:10px"><label>Días</label>
+<div class="checkbox-group">
+<label><input type="checkbox" class="fDia" value="Lunes"> Lun</label>
+<label><input type="checkbox" class="fDia" value="Martes"> Mar</label>
+<label><input type="checkbox" class="fDia" value="Miércoles"> Mié</label>
+<label><input type="checkbox" class="fDia" value="Jueves"> Jue</label>
+<label><input type="checkbox" class="fDia" value="Viernes"> Vie</label>
+<label><input type="checkbox" class="fDia" value="Sábado"> Sáb</label>
+<label><input type="checkbox" class="fDia" value="Domingo"> Dom</label>
+</div></div>
+<button class="btn btn-add" onclick="agregarEmpleado()">✓ Agregar</button>
+</div>
+</div>
+<!-- TURNOS -->
+<div class="card glass">
+<h2>📅 Turnos</h2>
+<div class="card-desc">Turnos semanales de 5h cada uno. Cada turno necesita 2 empleados.</div>
+<table><thead><tr><th>ID</th><th>Día</th><th>Horario</th><th>Req.</th></tr></thead><tbody>
+{% for t in turnos %}<tr><td>{{ t.id }}</td><td>{{ t.dia }}</td><td>{{ t.horario }}</td><td>{{ t.empleados_requeridos }}</td></tr>{% endfor %}
+</tbody></table>
+</div>
+</div>
+
+<!-- RESULTADOS -->
+<div id="resultadosSection">
+{% if resultado_heur or resultado_mlp %}
+<h3 class="section-title">📌 Resultados: Asignaciones</h3>
+<div class="card-desc" style="margin-bottom:14px;border-radius:10px;padding:10px 14px;background:rgba(59,130,246,.06);border-left:3px solid rgba(59,130,246,.3);font-size:.78rem;color:#94a3b8;line-height:1.5">
+<span style="color:#4ade80">✓</span> = Turno con todos los empleados cubiertos. <span style="color:#fbbf24">⚠ X/2</span> = Faltan empleados.
+</div>
+<div class="grid">
+<div class="card glass">
+<h2>⚙️ Heurística Greedy</h2>
+{% if resultado_heur %}<table><thead><tr><th>Turno</th><th>Día</th><th>Empleados</th><th>Estado</th></tr></thead><tbody>
+{% for a in resultado_heur.asignaciones %}
+<tr><td>{{ a.turno_id }}</td><td>{{ a.dia }}</td><td>{% for e in a.empleados_asignados %}<span class="emp-tag">{{ e }}</span>{% endfor %}</td><td>{% if a.empleados_asignados|length >= 2 %}<span class="badge badge-ok">✓</span>{% else %}<span class="badge badge-warn">⚠ {{ a.empleados_asignados|length }}/2</span>{% endif %}</td></tr>
+{% endfor %}</tbody></table>{% endif %}
+</div>
+<div class="card glass">
+<h2>🧠 MLP</h2>
+{% if resultado_mlp %}<table><thead><tr><th>Turno</th><th>Día</th><th>Empleados</th><th>Estado</th></tr></thead><tbody>
+{% for a in resultado_mlp.asignaciones %}
+<tr><td>{{ a.turno_id }}</td><td>{{ a.dia }}</td><td>{% for e in a.empleados_asignados %}<span class="emp-tag">{{ e }}</span>{% endfor %}</td><td>{% if a.empleados_asignados|length >= 2 %}<span class="badge badge-ok">✓</span>{% else %}<span class="badge badge-warn">⚠ {{ a.empleados_asignados|length }}/2</span>{% endif %}</td></tr>
+{% endfor %}</tbody></table>{% endif %}
+</div>
+</div>
+{% endif %}
+
+{% if comparacion %}
+<h3 class="section-title">📈 Comparación</h3>
+<div class="grid">
+<div class="card glass">
+<h2>🏆 Métricas</h2>
+<table><thead><tr><th>Métrica</th><th>Heurística</th><th>MLP</th><th>Ganador</th></tr></thead><tbody>
+<tr><td>Cobertura</td><td>{{ comparacion.metricas.heuristica.turnos_cubiertos }}/{{ comparacion.metricas.heuristica.turnos_total }}</td><td>{{ comparacion.metricas.mlp.turnos_cubiertos }}/{{ comparacion.metricas.mlp.turnos_total }}</td><td class="winner">{{ comparacion.ganadores.cobertura }}</td></tr>
+<tr><td>Horas totales</td><td>{{ comparacion.metricas.heuristica.horas_totales }}h</td><td>{{ comparacion.metricas.mlp.horas_totales }}h</td><td class="winner">{{ comparacion.ganadores.utilizacion }}</td></tr>
+<tr><td>Desv. Estándar</td><td>{{ comparacion.metricas.heuristica.horas_std }}</td><td>{{ comparacion.metricas.mlp.horas_std }}</td><td class="winner">{{ comparacion.ganadores.equilibrio }}</td></tr>
+</tbody></table>
+</div>
+<div class="card glass"><h2>📊 Horas</h2><div class="chart-container"><canvas id="chartHoras"></canvas></div></div>
+</div>
+{% endif %}
+
+{% if historial %}
+<h3 class="section-title">🔬 Entrenamiento MLP</h3>
+<div class="grid">
+<div class="card glass"><h2>📉 Loss</h2><div class="chart-container"><canvas id="chartLoss"></canvas></div></div>
+<div class="card glass"><h2>📈 Accuracy</h2><div class="chart-container"><canvas id="chartAcc"></canvas></div></div>
+</div>
+{% endif %}
+</div>
+
+<div class="footer">Dashboard Dinámico — Scheduling IA • TensorFlow/Keras • Flask</div>
+</div>
+
+<script>
+const CS={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e2e8f0',font:{size:10}}}}};
+const SC={x:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(51,65,85,.3)'}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(51,65,85,.3)'}}};
+
+{% if comparacion %}
+new Chart(document.getElementById('chartHoras'),{type:'bar',data:{
+labels:[{% for e in empleados %}'{{e.id}} {{e.nombre}}'{% if not loop.last %},{% endif %}{% endfor %}],
+datasets:[
+{label:'Heurística',data:[{% for e in empleados %}{{comparacion.metricas.heuristica.horas_por_empleado[e.id]}}{% if not loop.last %},{% endif %}{% endfor %}],backgroundColor:'rgba(96,165,250,.7)',borderRadius:6},
+{label:'MLP',data:[{% for e in empleados %}{{comparacion.metricas.mlp.horas_por_empleado[e.id]}}{% if not loop.last %},{% endif %}{% endfor %}],backgroundColor:'rgba(74,222,128,.7)',borderRadius:6},
+{label:'Máximo',data:[{% for e in empleados %}{{e.horas_max_semana}}{% if not loop.last %},{% endif %}{% endfor %}],type:'line',borderColor:'#f87171',borderDash:[5,5],fill:false,pointRadius:4,pointBackgroundColor:'#f87171'}
+]},options:{...CS,scales:SC}});
+{% endif %}
+
+{% if historial %}
+const eL=Array.from({length:{{historial.epochs}}},(_, i)=>i+1);
+new Chart(document.getElementById('chartLoss'),{type:'line',data:{labels:eL,datasets:[
+{label:'Train',data:{{historial.loss}},borderColor:'#3b82f6',fill:false,tension:.3,pointRadius:0,borderWidth:2},
+{label:'Val',data:{{historial.val_loss}},borderColor:'#f97316',fill:false,tension:.3,pointRadius:0,borderWidth:2}
+]},options:{...CS,scales:SC}});
+new Chart(document.getElementById('chartAcc'),{type:'line',data:{labels:eL,datasets:[
+{label:'Train',data:{{historial.accuracy}},borderColor:'#22c55e',fill:false,tension:.3,pointRadius:0,borderWidth:2},
+{label:'Val',data:{{historial.val_accuracy}},borderColor:'#eab308',fill:false,tension:.3,pointRadius:0,borderWidth:2}
+]},options:{...CS,scales:{...SC,y:{...SC.y,min:0,max:1}}}});
+{% endif %}
+
+function showStatus(msg, ok){
+    const s=document.getElementById('status');
+    s.className=ok?'ok':'err'; s.textContent=msg; s.style.display='block';
+    setTimeout(()=>s.style.display='none',5000);
+}
+
+async function agregarEmpleado(){
+    const nombre=document.getElementById('fNombre').value.trim();
+    if(!nombre){showStatus('⚠ Escribe un nombre','err');return}
+    const dias=[...document.querySelectorAll('.fDia:checked')].map(c=>c.value);
+    if(!dias.length){showStatus('⚠ Selecciona al menos un día','err');return}
+    const body={nombre, horas_max:document.getElementById('fHoras').value, horario:document.getElementById('fHorario').value, dias};
+    try{
+        const r=await fetch('/api/agregar_empleado',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        const d=await r.json();
+        if(d.ok){
+            showStatus(`✓ ${d.empleado.nombre} agregado (${d.empleado.id}). Total: ${d.total}. Presiona "Recalcular" para actualizar resultados.`,true);
+            // Add row to table
+            const tbody=document.querySelector('#tablaEmpleados tbody');
+            const tr=document.createElement('tr');
+            tr.innerHTML=`<td><span class="emp-tag">${d.empleado.id}</span></td><td>${d.empleado.nombre}</td><td>${d.empleado.horas_max_semana}h</td><td style="font-size:.72rem">${Object.keys(d.empleado.disponibilidad).join(', ')}</td>`;
+            tbody.appendChild(tr);
+            document.getElementById('mEmps').textContent=d.total;
+            document.getElementById('fNombre').value='';
+            document.querySelectorAll('.fDia').forEach(c=>c.checked=false);
+        }
+    }catch(e){showStatus('Error: '+e.message,false)}
+}
+
+async function recalcular(){
+    const btn=document.getElementById('btnRecalc');
+    btn.disabled=true;
+    document.getElementById('overlay').classList.add('show');
+    try{
+        const r=await fetch('/api/recalcular',{method:'POST',headers:{'Content-Type':'application/json'}});
+        const d=await r.json();
+        if(d.ok){
+            showStatus('✓ Cálculo completo. Recargando...',true);
+            setTimeout(()=>location.reload(),500);
+        }
+    }catch(e){showStatus('Error: '+e.message,false)}
+    finally{btn.disabled=false;document.getElementById('overlay').classList.remove('show')}
+}
+</script>
+</body>
+</html>

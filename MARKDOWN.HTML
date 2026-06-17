@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features MLP vs Heurística</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            
+            /* Colores Heurística (Lógica/Secuencial) */
+            --heu-main: #0284c7;
+            --heu-light: #e0f2fe;
+            --heu-gradient: linear-gradient(135deg, #0ea5e9, #0284c7);
+
+            /* Colores MLP (Neuronal/Complejo) */
+            --mlp-main: #7c3aed;
+            --mlp-light: #ede9fe;
+            --mlp-gradient: linear-gradient(135deg, #a855f7, #7c3aed);
+
+            /* Acentos */
+            --success: #10b981;
+            --danger: #ef4444;
+            --neutral-border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Tipografía Moderna */
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #2563eb, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+        }
+
+        /* Tarjetas Aéreas */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--neutral-border);
+        }
+
+        .card-header.heu h2 { color: var(--heu-main); }
+        .card-header.mlp h2 { color: var(--mlp-main); }
+
+        /* Estilos de Tablas Modernas */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            border: 1px solid var(--neutral-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: white;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--neutral-border);
+        }
+
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: #f8fafc;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        
+        .heu-table tr:hover { background-color: var(--heu-light); }
+        .mlp-table tr:hover { background-color: var(--mlp-light); }
+
+        /* Bloques de Código */
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 16px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Listas de Pros y Contras */
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pros, .cons {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+        }
+
+        .pros h4 { color: var(--success); margin-bottom: 1rem; font-size: 1.2rem; }
+        .cons h4 { color: var(--danger); margin-bottom: 1rem; font-size: 1.2rem; }
+
+        ul { list-style: none; }
+        
+        .pros ul li, .cons ul li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .pros ul li::before { content: '✅'; position: absolute; left: 0; top: 0px; }
+        .cons ul li::before { content: '❌'; position: absolute; left: 0; top: 0px; }
+
+        /* Badges (Píldoras de colores) */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-binario { background: #fee2e2; color: #991b1b; }
+        .badge-orden { background: #dcfce7; color: #166534; }
+        .badge-math { background: #f3e8ff; color: #6b21a8; font-family: monospace;}
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--neutral-border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .pros-cons { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+            .card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🧠 Features del MLP vs Heurística</h1>
+            <p class="subtitle">Proyecto Scheduling con IA</p>
+        </header>
+
+        <div class="card">
+            <p style="font-size: 1.1rem; text-align: center; color: var(--text-muted);">
+                Este documento describe las <strong>características (features)</strong> que utiliza cada método de asignación de turnos: la <strong>Heurística Greedy</strong> y la <strong>Red Neuronal MLP (Multi-Layer Perceptron)</strong>.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header heu">
+                <h2>⚙️ Heurística Greedy — Criterios de Decisión</h2>
+            </div>
+            <p>La heurística <strong>NO usa features numéricas</strong>. En su lugar, aplica <strong>reglas determinísticas</strong> en orden de prioridad:</p>
+
+            <div class="table-wrapper heu-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Criterio</th>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>Disponibilidad</strong></td>
+                            <td>¿El empleado trabaja ese día y horario?</td>
+                            <td><span class="badge badge-binario">Filtro binario (sí/no)</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><strong>Horas restantes</strong></td>
+                            <td>¿Puede trabajar 5h más sin exceder su máximo semanal?</td>
+                            <td><span class="badge badge-binario">Filtro binario (sí/no)</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><strong>Un turno por día</strong></td>
+                            <td>¿Ya fue asignado a otro turno ese mismo día?</td>
+                            <td><span class="badge badge-binario">Filtro binario (sí/no)</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><strong>Menor carga</strong></td>
+                            <td>Entre los candidatos válidos, elige al que tenga <strong>menos horas acumuladas</strong></td>
+                            <td><span class="badge badge-orden">Ordenamiento</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Flujo de la Heurística:</h3>
+<pre><code>Para cada turno (en orden T1, T2, ..., T8):
+  1. Filtrar empleados disponibles en ese día/horario
+  2. Filtrar los que no exceden horas máximas
+  3. Filtrar los que no trabajan ya ese día
+  4. Ordenar por horas acumuladas (ascendente)
+  5. Asignar los primeros N empleados (N = requeridos)</code></pre>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Ventajas</h4>
+                    <ul>
+                        <li>Rápido (O(n·m) donde n=turnos, m=empleados)</li>
+                        <li>Determinístico (siempre da el mismo resultado)</li>
+                        <li>Fácil de implementar y entender</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Limitaciones</h4>
+                    <ul>
+                        <li><strong>Miope</strong>: Solo ve el turno actual, no planifica a futuro</li>
+                        <li>No optimiza globalmente (puede dejar turnos sin cubrir al final)</li>
+                        <li>El orden de procesamiento de turnos afecta el resultado</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header mlp">
+                <h2>🧠 Red Neuronal MLP — Features de Entrada</h2>
+            </div>
+            <p>El MLP recibe un <strong>vector de 10 features numéricas</strong> por cada par (empleado, turno) y predice la <strong>probabilidad de asignación</strong> (0.0 a 1.0).</p>
+
+            <h3>Vector de 10 Features:</h3>
+            <div class="table-wrapper mlp-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Feature</th>
+                            <th>Fórmula</th>
+                            <th>Rango</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td><code>horas_max_norm</code></td><td><span class="badge badge-math">horas_max_semana / 40</span></td><td>[0, 1.2]</td><td>Capacidad máxima del empleado normalizada</td></tr>
+                        <tr><td>1</td><td><code>horas_asignadas</code></td><td><span class="badge badge-math">horas_acumuladas / 40</span></td><td>[0, 1.2]</td><td>Cuántas horas ya lleva asignadas</td></tr>
+                        <tr><td>2</td><td><code>horas_restantes</code></td><td><span class="badge badge-math">max(0, max - asignadas) / 40</span></td><td>[0, 1.2]</td><td>Cuántas horas más puede trabajar</td></tr>
+                        <tr><td>3</td><td><code>disponible</code></td><td><span class="badge badge-math">esta_disponible(emp, turno)</span></td><td>{0, 1}</td><td>¿Puede trabajar ese día/horario?</td></tr>
+                        <tr><td>4</td><td><code>dia_norm</code></td><td><span class="badge badge-math">DIAS_MAP[dia] / 6</span></td><td>[0, 1]</td><td>Día de la semana codificado (Lun=0, Dom=1)</td></tr>
+                        <tr><td>5</td><td><code>horario_norm</code></td><td><span class="badge badge-math">HORARIOS_MAP[horario] / 2</span></td><td>[0, 0.5, 1]</td><td>Franja horaria (Mañana=0, Tarde=0.5, Completo=1)</td></tr>
+                        <tr><td>6</td><td><code>emp_requeridos</code></td><td><span class="badge badge-math">turno.requeridos / 3</span></td><td>[0, 1]</td><td>Cuántos empleados necesita el turno</td></tr>
+                        <tr><td>7</td><td><code>ya_trabaja_dia</code></td><td><span class="badge badge-math">1 si ya asignado ese día</span></td><td>{0, 1}</td><td>¿Ya tiene un turno ese día?</td></tr>
+                        <tr><td>8</td><td><code>ratio_uso</code></td><td><span class="badge badge-math">asignadas / max</span></td><td>[0, 1]</td><td>Porcentaje de capacidad utilizada</td></tr>
+                        <tr><td>9</td><td><code>dias_disponibles</code></td><td><span class="badge badge-math">len(disponibilidad) / 7</span></td><td>[0, 1]</td><td>Flexibilidad del empleado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Arquitectura del MLP:</h3>
+<pre><code>Input(10) → Dense(64, ReLU) → Dense(32, ReLU) → Dense(16, ReLU) → Dense(1, Sigmoid)</code></pre>
+
+            <div class="table-wrapper mlp-table">
+                <table>
+                    <thead>
+                        <tr><th>Capa</th><th>Neuronas</th><th>Activación</th><th>Parámetros</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Entrada</td><td>10</td><td>—</td><td>—</td></tr>
+                        <tr><td>Oculta 1</td><td>64</td><td>ReLU</td><td>704 (10×64 + 64 bias)</td></tr>
+                        <tr><td>Oculta 2</td><td>32</td><td>ReLU</td><td>2,080 (64×32 + 32 bias)</td></tr>
+                        <tr><td>Oculta 3</td><td>16</td><td>ReLU</td><td>528 (32×16 + 16 bias)</td></tr>
+                        <tr><td>Salida</td><td>1</td><td>Sigmoid</td><td>17 (16×1 + 1 bias)</td></tr>
+                        <tr style="background: var(--mlp-light); font-weight: bold;"><td>Total</td><td></td><td></td><td>3,329 parámetros</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div>
+                    <h3>Hiperparámetros:</h3>
+                    <div class="table-wrapper mlp-table">
+                        <table>
+                            <thead>
+                                <tr><th>Parámetro</th><th>Valor</th><th>Justificación</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Épocas</td><td>50</td><td>Suficiente para convergencia sin sobreajuste</td></tr>
+                                <tr><td>Batch Size</td><td>32</td><td>Balance entre velocidad y estabilidad de gradientes</td></tr>
+                                <tr><td>Optimizador</td><td>Adam (lr=0.001)</td><td>Adapta tasa de aprendizaje por parámetro</td></tr>
+                                <tr><td>Loss</td><td>Binary Crossentropy</td><td>Estándar para clasificación binaria</td></tr>
+                                <tr><td>Train/Val Split</td><td>80% / 20%</td><td>Validación para detectar sobreajuste</td></tr>
+                                <tr><td>Dataset</td><td>20,000 muestras</td><td>500 soluciones × 5 emp × 8 turnos</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>Funciones de Activación:</h3>
+                    <div class="table-wrapper mlp-table">
+                        <table>
+                            <thead>
+                                <tr><th>Función</th><th>Fórmula</th><th>Dónde se usa</th><th>Por qué</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>ReLU</strong></td><td><code>f(x) = max(0, x)</code></td><td>Capas ocultas</td><td>Rápida, evita desvanecimiento del gradiente</td></tr>
+                                <tr><td><strong>Sigmoid</strong></td><td><code>f(x) = 1/(1+e<sup>-x</sup>)</code></td><td>Capa de salida</td><td>Salida [0,1] = probabilidad de asignación</td></tr>
+                                <tr><td><del>Tanh</del></td><td><code>f(x) = tanh(x)</code></td><td>No usada</td><td>Más lenta que ReLU, susceptible a vanishing gradient</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Ventajas del MLP</h4>
+                    <ul>
+                        <li>Aprende patrones complejos no lineales</li>
+                        <li>Generaliza a combinaciones no vistas en entrenamiento</li>
+                        <li>Puede mejorar con más datos</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Limitaciones del MLP</h4>
+                    <ul>
+                        <li>Requiere dataset de entrenamiento (generado sintéticamente)</li>
+                        <li>Mayor costo computacional</li>
+                        <li>Puede sobreajustar con pocos datos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background: linear-gradient(180deg, #ffffff, #f8fafc);">
+            <div class="card-header" style="justify-content: center; border-bottom: none;">
+                <h2 style="font-size: 2rem;">🏆 Comparación Directa</h2>
+            </div>
+            
+            <div class="table-wrapper" style="box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+                <table style="text-align: center;">
+                    <thead style="background: #1e293b; color: white;">
+                        <tr>
+                            <th style="color: white; text-align: left;">Aspecto</th>
+                            <th style="color: var(--heu-light);">Heurística</th>
+                            <th style="color: var(--mlp-light);">MLP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="text-align: left; font-weight: 600;">Entradas</td><td>Reglas fijas</td><td>10 features numéricas</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Decisión</td><td>Determinística, secuencial</td><td>Probabilística, paralela</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Aprendizaje</td><td>No aprende</td><td>Aprende de datos</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Velocidad</td><td>Instantánea</td><td>Requiere entrenamiento previo</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Adaptabilidad</td><td>Rígida</td><td>Se adapta a nuevos patrones</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Optimalidad</td><td>Local (greedy)</td><td>Puede acercarse a global</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Interpretabilidad</td><td>Alta (reglas claras)</td><td>Baja (caja negra)</td></tr>
+                        <tr><td style="text-align: left; font-weight: 600;">Escalabilidad</td><td>Buena</td><td>Excelente con más datos</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Proyecto Integrador — IA Moderna Aplicada al Scheduling</strong></p>
+            <p style="opacity: 0.7; margin-top: 5px;">TensorFlow/Keras • Python • Flask</p>
+        </footer>
+    </div>
+
+</body>
+</html>

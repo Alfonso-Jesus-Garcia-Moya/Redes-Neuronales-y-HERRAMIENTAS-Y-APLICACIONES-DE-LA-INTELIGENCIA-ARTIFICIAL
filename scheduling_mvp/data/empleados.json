@@ -1,0 +1,164 @@
+[
+  {
+    "id": "E1",
+    "nombre": "Ana",
+    "horas_max_semana": 40,
+    "disponibilidad": {
+      "Lunes": [
+        "Mañana"
+      ],
+      "Martes": [
+        "Mañana"
+      ],
+      "Miércoles": [
+        "Mañana"
+      ],
+      "Jueves": [
+        "Mañana"
+      ],
+      "Viernes": [
+        "Mañana"
+      ]
+    }
+  },
+  {
+    "id": "E2",
+    "nombre": "Luis",
+    "horas_max_semana": 30,
+    "disponibilidad": {
+      "Lunes": [
+        "Tarde"
+      ],
+      "Martes": [
+        "Tarde"
+      ],
+      "Miércoles": [
+        "Tarde"
+      ],
+      "Jueves": [
+        "Tarde"
+      ],
+      "Viernes": [
+        "Tarde"
+      ],
+      "Sábado": [
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E3",
+    "nombre": "María",
+    "horas_max_semana": 20,
+    "disponibilidad": {
+      "Miércoles": [
+        "Mañana"
+      ],
+      "Jueves": [
+        "Mañana"
+      ],
+      "Viernes": [
+        "Mañana"
+      ],
+      "Sábado": [
+        "Mañana"
+      ],
+      "Domingo": [
+        "Mañana"
+      ]
+    }
+  },
+  {
+    "id": "E4",
+    "nombre": "Carlos",
+    "horas_max_semana": 35,
+    "disponibilidad": {
+      "Lunes": [
+        "Mañana",
+        "Tarde"
+      ],
+      "Martes": [
+        "Mañana",
+        "Tarde"
+      ],
+      "Miércoles": [
+        "Mañana",
+        "Tarde"
+      ],
+      "Jueves": [
+        "Mañana",
+        "Tarde"
+      ],
+      "Viernes": [
+        "Mañana",
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E5",
+    "nombre": "Sofía",
+    "horas_max_semana": 25,
+    "disponibilidad": {
+      "Sábado": [
+        "Mañana",
+        "Tarde"
+      ],
+      "Domingo": [
+        "Mañana",
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E6",
+    "nombre": "ALFONSO",
+    "horas_max_semana": 40,
+    "disponibilidad": {
+      "Lunes": [
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E7",
+    "nombre": "LUIS",
+    "horas_max_semana": 40,
+    "disponibilidad": {
+      "Domingo": [
+        "Mañana"
+      ]
+    }
+  },
+  {
+    "id": "E8",
+    "nombre": "VIOLETA",
+    "horas_max_semana": 40,
+    "disponibilidad": {
+      "Domingo": [
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E9",
+    "nombre": "LUIS",
+    "horas_max_semana": 40,
+    "disponibilidad": {
+      "Martes": [
+        "Tarde"
+      ]
+    }
+  },
+  {
+    "id": "E10",
+    "nombre": "TITO",
+    "horas_max_semana": 50,
+    "disponibilidad": {
+      "Domingo": [
+        "Mañana",
+        "Tarde"
+      ]
+    }
+  }
+]

@@ -1,0 +1,200 @@
+{
+  "metricas": {
+    "heuristica": {
+      "metodo": "Heurística Greedy",
+      "turnos_cubiertos": 7,
+      "turnos_total": 8,
+      "cobertura_pct": 87.5,
+      "horas_totales": 75,
+      "horas_promedio": 7.5,
+      "horas_std": 5.59,
+      "horas_min": 0,
+      "horas_max": 15,
+      "horas_por_empleado": {
+        "E1": 15,
+        "E2": 15,
+        "E3": 5,
+        "E4": 15,
+        "E5": 10,
+        "E6": 5,
+        "E7": 0,
+        "E8": 0,
+        "E9": 5,
+        "E10": 5
+      }
+    },
+    "mlp": {
+      "metodo": "Red Neuronal MLP",
+      "turnos_cubiertos": 6,
+      "turnos_total": 8,
+      "cobertura_pct": 75.0,
+      "horas_totales": 70,
+      "horas_promedio": 7.0,
+      "horas_std": 5.1,
+      "horas_min": 0,
+      "horas_max": 15,
+      "horas_por_empleado": {
+        "E1": 10,
+        "E2": 15,
+        "E3": 5,
+        "E4": 15,
+        "E5": 10,
+        "E6": 5,
+        "E7": 0,
+        "E8": 0,
+        "E9": 5,
+        "E10": 5
+      }
+    }
+  },
+  "ganadores": {
+    "cobertura": "Heurística",
+    "equilibrio": "MLP",
+    "utilizacion": "Heurística"
+  },
+  "asignaciones_heuristica": [
+    {
+      "turno_id": "T1",
+      "dia": "Lunes",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E1",
+        "E4"
+      ]
+    },
+    {
+      "turno_id": "T2",
+      "dia": "Lunes",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E2",
+        "E6"
+      ]
+    },
+    {
+      "turno_id": "T3",
+      "dia": "Martes",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E1",
+        "E4"
+      ]
+    },
+    {
+      "turno_id": "T4",
+      "dia": "Martes",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E9",
+        "E2"
+      ]
+    },
+    {
+      "turno_id": "T5",
+      "dia": "Miércoles",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E3",
+        "E1"
+      ]
+    },
+    {
+      "turno_id": "T6",
+      "dia": "Miércoles",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E2",
+        "E4"
+      ]
+    },
+    {
+      "turno_id": "T7",
+      "dia": "Sábado",
+      "horario": "Completo",
+      "empleados_asignados": [
+        "E5"
+      ]
+    },
+    {
+      "turno_id": "T8",
+      "dia": "Domingo",
+      "horario": "Completo",
+      "empleados_asignados": [
+        "E10",
+        "E5"
+      ]
+    }
+  ],
+  "asignaciones_mlp": [
+    {
+      "turno_id": "T1",
+      "dia": "Lunes",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E4",
+        "E1"
+      ]
+    },
+    {
+      "turno_id": "T2",
+      "dia": "Lunes",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E6",
+        "E2"
+      ]
+    },
+    {
+      "turno_id": "T3",
+      "dia": "Martes",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E4",
+        "E1"
+      ]
+    },
+    {
+      "turno_id": "T4",
+      "dia": "Martes",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E9",
+        "E2"
+      ]
+    },
+    {
+      "turno_id": "T5",
+      "dia": "Miércoles",
+      "horario": "Mañana",
+      "empleados_asignados": [
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "turno_id": "T6",
+      "dia": "Miércoles",
+      "horario": "Tarde",
+      "empleados_asignados": [
+        "E2"
+      ]
+    },
+    {
+      "turno_id": "T7",
+      "dia": "Sábado",
+      "horario": "Completo",
+      "empleados_asignados": [
+        "E5"
+      ]
+    },
+    {
+      "turno_id": "T8",
+      "dia": "Domingo",
+      "horario": "Completo",
+      "empleados_asignados": [
+        "E5",
+        "E10"
+      ]
+    }
+  ]
+}
